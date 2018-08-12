@@ -40,6 +40,26 @@ function postBlogposts(url, data) {
 
 // 2. delete post function
 
+function deletePost(timestamp) {
+  fetch('/delete-post/' + timestamp, {
+    method: 'DELETE'
+  })
+    .then(function(res) {
+      res.json().then(function(json) {
+        if (json.success) {
+          var element = document.getElementById(timestamp);
+          element.outerHTML = '';
+          delete element;
+        } else {
+          alert('Delete failed!');
+        }
+      });
+    })
+    .catch(function(err) {
+      alert('Delete failed!\n\n' + err);
+    });
+}
+
 function getBlogposts(url) {
   fetch(url, {
     method: 'GET'
@@ -78,6 +98,21 @@ function addBlogPostToPage(post) {
   postDetail.innerHTML = formatDate(post.timestamp);
 
   // 3. insert delete button here
+
+  var delButton = document.createElement('div');
+  delButton.onclick = function() {
+    if (
+      confirm(
+        "Are you sure you want to delete this post?  You can't undo this."
+      )
+    ) {
+      deletePost(post.timestamp);
+    }
+  };
+  delButton.className = 'delButton';
+  delButton.innerHTML =
+    '<i class="fa fa-trash-o" aria-hidden="true"></i> Delete';
+  postDetail.appendChild(delButton);
 
   // 2. insert mood display here
 
