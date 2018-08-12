@@ -8,11 +8,11 @@ function ready() {
   getBlogposts('/get-posts');
 
   // send posts to server
-  var form = document.querySelector('form');
-  form.addEventListener('submit', function(event) {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', (event) => {
     event.preventDefault(); // prevents the form from contacting our server automatically (we want to do it ourselves)
-    var formActionUrl = form.action; // 'form.action' is the url '/create-post'
-    var formData = new FormData(form);
+    let formActionUrl = form.action; // 'form.action' is the url '/create-post'
+    let formData = new FormData(form);
 
     postBlogposts(formActionUrl, formData);
   });
@@ -21,33 +21,33 @@ function ready() {
 /****
  * Function definitions
  ***/
-function postBlogposts(url, data) {
+postBlogposts = (url, data) => {
   fetch(url, {
     method: 'POST',
     body: data
   })
-    .then(function(res) {
-      res.json().then(function(json) {
+    .then((res) => {
+      res.json().then((json) => {
         console.log(json);
         addBlogPostToPage(json);
         document.querySelector('form').reset();
       });
     })
-    .catch(function(err) {
+    .catch((err) => {
       console.error(err);
     });
-}
+};
 
 // 2. delete post function
 
-function deletePost(timestamp) {
+deletePost = (timestamp) => {
   fetch('/delete-post/' + timestamp, {
     method: 'DELETE'
   })
-    .then(function(res) {
-      res.json().then(function(json) {
+    .then((res) => {
+      res.json().then((json) => {
         if (json.success) {
-          var element = document.getElementById(timestamp);
+          let element = document.getElementById(timestamp);
           element.outerHTML = '';
           delete element;
         } else {
@@ -55,37 +55,37 @@ function deletePost(timestamp) {
         }
       });
     })
-    .catch(function(err) {
+    .catch((err) => {
       alert('Delete failed!\n\n' + err);
     });
-}
+};
 
-function getBlogposts(url) {
+getBlogposts = (url) => {
   fetch(url, {
     method: 'GET'
   })
-    .then(function(res) {
-      res.json().then(function(json) {
+    .then((res) => {
+      res.json().then((json) => {
         console.log(json);
         addBlogpostsToPage(json);
       });
     })
-    .catch(function(err) {
+    .catch((err) => {
       console.error(err);
     });
-}
+};
 
-function addBlogPostToPage(post) {
+addBlogPostToPage = (post) => {
   console.log('add one:', post);
-  var postDiv = document.createElement('div');
-  var postText = document.createElement('div');
-  var postContainer = document.querySelector('.post-container');
+  let postDiv = document.createElement('div');
+  let postText = document.createElement('div');
+  let postContainer = document.querySelector('.post-container');
 
   // put <p> tags around each separate line of blogpost, otherwise
   // they will all run together
   postText.innerHTML = post.content
     .split('\n')
-    .map(function(item) {
+    .map((item) => {
       return '<p>' + item + '</p>';
     })
     .join('');
@@ -93,14 +93,14 @@ function addBlogPostToPage(post) {
   postDiv.id = post.timestamp;
   postDiv.className = 'post';
 
-  var postDetail = document.createElement('div');
+  const postDetail = document.createElement('div');
   postDetail.className = 'postDetail';
   postDetail.innerHTML = formatDate(post.timestamp);
 
   // 3. insert delete button here
 
-  var delButton = document.createElement('div');
-  delButton.onclick = function() {
+  const delButton = document.createElement('div');
+  delButton.onclick = () => {
     if (
       confirm(
         "Are you sure you want to delete this post?  You can't undo this."
@@ -116,7 +116,7 @@ function addBlogPostToPage(post) {
 
   // 2. insert mood display here
 
-  var moodNames = [
+  const moodNames = [
     '',
     '<span class="emoji">😃</span> Happy',
     '<span class="emoji">😛</span> Joking',
@@ -128,7 +128,7 @@ function addBlogPostToPage(post) {
     '<span class="emoji">👑</span> Triumphant',
     '<span class="emoji">😍</span> In love'
   ];
-  var moodDiv = document.createElement('div');
+  const moodDiv = document.createElement('div');
   moodDiv.className = 'mood';
   moodDiv.innerHTML = moodNames[post.mood];
   postText.append(moodDiv);
@@ -136,15 +136,15 @@ function addBlogPostToPage(post) {
   postDiv.appendChild(postText);
   postDiv.appendChild(postDetail);
   postContainer.prepend(postDiv);
-}
+};
 
-function formatDate(timestamp) {
-  var dateObj = new Date(timestamp);
+formatDate = (timestamp) => {
+  const dateObj = new Date(timestamp);
   return dateObj.toLocaleString();
-}
+};
 
-function addBlogpostsToPage(data) {
-  for (var i = 0; i < data.blogposts.length; i++) {
+addBlogpostsToPage = (data) => {
+  for (let i = 0; i < data.blogposts.length; i++) {
     addBlogPostToPage(data.blogposts[i]);
   }
-}
+};
